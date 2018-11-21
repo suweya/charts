@@ -348,19 +348,19 @@ let componentConfigs = {
 			this.unitType = 'dot';
 			this.paths = {};
 			if(!c.hideLine) {
-				// this.paths = getPaths(
-				// 	data.xPositions,
-				// 	data.yPositions,
-				// 	c.color,
-				// 	{
-				// 		heatline: c.heatline,
-				// 		regionFill: c.regionFill
-				// 	},
-				// 	{
-				// 		svgDefs: c.svgDefs,
-				// 		zeroLine: data.zeroLine
-				// 	}
-				// );
+				this.paths = getPaths(
+					data.xPositions,
+					data.yPositions,
+					c.color,
+					{
+						heatline: c.heatline,
+						regionFill: c.regionFill
+					},
+					{
+						svgDefs: c.svgDefs,
+						zeroLine: data.zeroLine
+					}
+				);
 			}
 
 			this.units = [];
