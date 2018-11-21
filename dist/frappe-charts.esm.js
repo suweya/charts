@@ -298,10 +298,6 @@ class SvgTip {
 	}
 }
 
-/**
- * Returns the value of a number upto 2 decimal places.
- * @param {Number} d Any number
- */
 function floatTwo(d) {
 	return parseFloat(d.toFixed(2));
 }
@@ -470,26 +466,6 @@ function createSVG(tag, o) {
 	return element;
 }
 
-function renderVerticalGradient(svgDefElem, gradientId) {
-	return createSVG('linearGradient', {
-		inside: svgDefElem,
-		id: gradientId,
-		x1: 0,
-		x2: 0,
-		y1: 0,
-		y2: 1
-	});
-}
-
-function setGradientStop(gradElem, offset, color, opacity) {
-	return createSVG('stop', {
-		'inside': gradElem,
-		'style': `stop-color: ${color}`,
-		'offset': offset,
-		'stop-opacity': opacity
-	});
-}
-
 function makeSVGContainer(parent, className, width, height) {
 	return createSVG('svg', {
 		className: className,
@@ -537,20 +513,7 @@ function makeArcPathStr(startPosition, endPosition, center, radius, clockWise=1)
 		${arcEndX} ${arcEndY} z`;
 }
 
-function makeGradient(svgDefElem, color, lighter = false) {
-	let gradientId ='path-fill-gradient' + '-' + color + '-' +(lighter ? 'lighter' : 'default');
-	let gradientDef = renderVerticalGradient(svgDefElem, gradientId);
-	let opacities = [1, 0.6, 0.2];
-	if(lighter) {
-		opacities = [0.4, 0.2, 0];
-	}
 
-	setGradientStop(gradientDef, "0%", color, opacities[0]);
-	setGradientStop(gradientDef, "50%", color, opacities[1]);
-	setGradientStop(gradientDef, "100%", color, opacities[2]);
-
-	return gradientId;
-}
 
 function percentageBar(x, y, width, height,
 	depth=PERCENTAGE_BAR_DEFAULT_DEPTH, fill='none') {
@@ -953,31 +916,7 @@ function datasetDot(x, y, radius, color, label='', index=0) {
 	}
 }
 
-function getPaths(xList, yList, color, options={}, meta={}) {
-	let pointsList = yList.map((y, i) => (xList[i] + ',' + y));
-	let pointsStr = pointsList.join("L");
-	let path = makePath("M"+pointsStr, 'line-graph-path', color);
 
-	// HeatLine
-	if(options.heatline) {
-		let gradient_id = makeGradient(meta.svgDefs, color);
-		path.style.stroke = `url(#${gradient_id})`;
-	}
-
-	let paths = {
-		path: path
-	};
-
-	// Region
-	if(options.regionFill) {
-		let gradient_id_region = makeGradient(meta.svgDefs, color, true);
-
-		let pathStr = "M" + `${xList[0]},${meta.zeroLine}L` + pointsStr + `L${xList.slice(-1)[0]},${meta.zeroLine}`;
-		paths.region = makePath(pathStr, `region-fill`, 'none', `url(#${gradient_id_region})`);
-	}
-
-	return paths;
-}
 
 let makeOverlay = {
 	'bar': (unit) => {
@@ -2156,22 +2095,6 @@ let componentConfigs = {
 			let c = this.constants;
 			this.unitType = 'dot';
 			this.paths = {};
-			if(!c.hideLine) {
-				this.paths = getPaths(
-					data.xPositions,
-					data.yPositions,
-					c.color,
-					{
-						heatline: c.heatline,
-						regionFill: c.regionFill
-					},
-					{
-						svgDefs: c.svgDefs,
-						zeroLine: data.zeroLine
-					}
-				);
-			}
-
 			this.units = [];
 			if(!c.hideDots) {
 				this.units = data.yPositions.map((y, j) => {
@@ -3677,7 +3600,6 @@ class AxisChart extends BaseChart {
 	// removeDataPoint(index = 0) {}
 }
 
-// import MultiAxisChart from './charts/MultiAxisChart';
 const chartTypes = {
 	bar: AxisChart,
 	line: AxisChart,

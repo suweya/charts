@@ -536,8 +536,15 @@ export function datasetDot(x, y, radius, color, label='', index=0) {
 }
 
 export function getPaths(xList, yList, color, options={}, meta={}) {
-	let pointsList = yList.map((y, i) => (xList[i] + ',' + y));
-	let pointsStr = pointsList.join("L");
+	// let pointsList = yList.map((y, i) => (xList[i] + ',' + y));
+	let prevX;
+	let pointsList = yList.map((y, i) => {
+		const x = xList[i];
+		const value = i === 0 ? `${x},${y}` : `${(x + prevX)/2},${y} ${x},${y}`;
+		prevX = x;
+		return value;
+	});
+	let pointsStr = pointsList.join("S");
 	let path = makePath("M"+pointsStr, 'line-graph-path', color);
 
 	// HeatLine
